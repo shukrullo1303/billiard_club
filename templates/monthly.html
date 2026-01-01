@@ -1,0 +1,11 @@
+<label>Month:
+  <select name="month" id="month-select">
+    {% for y,m in months_with_data %}
+      {% if y == selected_year %}
+        <option value="{{ m }}" {% if m == selected_month %}selected{% endif %}>
+          {{ month_names.m }}
+        </option>
+      {% endif %}
+    {% endfor %}
+  </select>
+</label>

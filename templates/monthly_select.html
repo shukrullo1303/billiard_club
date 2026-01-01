@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Monthly Report Selection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      padding: 40px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #2c3e50;
+    }
+    form {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: 0 auto 40px auto;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      font-weight: bold;
+      color: #34495e;
+    }
+    select {
+      padding: 8px 12px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Choose Month for Report</h1>
+<form method="get" action="{% url 'reports:monthly_table' %}">
+    <label>Year:
+        <select name="year">
+            {% for y in years_with_data %}
+                <option value="{{ y }}" {% if y == selected_year %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Month:
+        <select name="month">
+            {% for m_num, m_name in month_list %}
+                {% if m_num in months_for_selected_year %}
+                    <option value="{{ m_num }}" {% if m_num == selected_month %}selected{% endif %}>{{ m_name }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </label>
+
+    <button type="submit">Show Report</button>
+</form>
+
+</body>
+</html>
