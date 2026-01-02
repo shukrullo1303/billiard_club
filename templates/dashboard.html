@@ -10,52 +10,68 @@
 
 <div class="table-container">
     {% for table in tables %}
-    <div class="table-card {% if table.active_session %}active{% else %}inactive{% endif %}" id="table-{{ table.id }}">
-        <div class="table-number">{{ table.number }} - {{ table.table_type }}</div>
-
-        <div class="timer-price">
-            <span class="timer" id="timer-{{ table.id }}">
-                {% if table.active_session %}
-                    {{ table.active_session.start_time|date:"H:i" }}
-                {% else %}
-                    00:00
-                {% endif %}
-            </span>
-            <span class="price" id="price-{{ table.id }}">
-                {% if table.active_session %}
-                    {{ table.active_session.total_price|default:"0" }}
-                {% else %}
-                    0
-                {% endif %}
-            </span>
-        </div>
-
-        <div class="btn-container">
-            <button class="btn start" id="start-{{ table.id }}"
-                onclick="startSession({{ table.id }})"
-                {% if table.active_session %}disabled{% endif %}>
-                START
-            </button>
-            <button class="btn stop" id="stop-{{ table.id }}"
-                onclick="stopSession({{ table.id }})"
-                {% if not table.active_session %}disabled{% endif %}>
-                STOP
-            </button>
-        </div>
-
-        <div class="session-list-container">
-            <ul class="session-list" id="session-list-{{ table.id }}">
-                {% for session in unpaid_sessions %}
-                    {% if session.table_id == table.id %}
-                        <li id="session-{{ session.id }}">
-                            {{ forloop.counter }} - {{ table.number }} - {{ session.start_time|date:"H:i" }} - {{ session.end_time|default:"--" }} - {{ session.total_price }}
-                            <button onclick="paySession({{ session.id }})">x</button>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </div>
+<div class="table-card {% if table.active_session %}active{% else %}inactive{% endif %}" 
+     id="table-{{ table.id }}"
+     data-table-id="{{ table.id }}"
+     data-price-per-hour="{{ table.price_per_hour }}"
+     {% if table.active_session %}
+         data-active-start="{{ table.active_session.start_time|date:'c' }}"
+     {% endif %}
+>
+    <div class="table-number">
+        {{ table.number }} - {{ table.table_type }}
     </div>
+
+    <div class="timer-price">
+        <span class="timer" id="timer-{{ table.id }}">
+            {% if table.active_session %}
+                {{ table.active_session.start_time|date:"H:i" }}
+            {% else %}
+                00:00
+            {% endif %}
+        </span>
+        <span class="price" id="price-{{ table.id }}">
+            {% if table.active_session %}
+                {{ table.active_session.total_price|default:"0" }}
+            {% else %}
+                0
+            {% endif %}
+        </span>
+    </div>
+
+    <div class="btn-container" style="display: flex; justify-content: center; margin-top: 10px">
+<button class="btn start {% if table.active_session %}btn-inactive{% endif %}" 
+        id="start-{{ table.id }}" 
+        onclick="startSession({{ table.id }})" 
+        {% if table.active_session %}disabled{% endif %}>
+    START
+</button>
+
+<button class="btn stop {% if table.active_session %}btn-active{% endif %}" 
+        id="stop-{{ table.id }}" 
+        onclick="stopSession({{ table.id }})" 
+        {% if table.active_session %}disabled{% endif %}>
+    STOP
+</button>
+    </div>
+
+    <div class="session-list-container">
+        <ul class="session-list" id="session-list-{{ table.id }}">
+            {% for session in unpaid_sessions %}
+                {% if session.table_id == table.id %}
+                    <li id="session-{{ session.id }}">
+                        {{ forloop.counter }} - Table {{ session.table_number }} - 
+                        {{ session.start_time|date:"H:i" }} - 
+                        {{ session.end_time|default:"--" }} - 
+                        {{ session.total_price }}
+                        <button onclick="paySession({{ session.id }})">x</button>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
     {% endfor %}
 </div>
 
