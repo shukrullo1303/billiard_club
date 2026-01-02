@@ -1,0 +1,35 @@
+.table-container{
+    display:grid;
+    grid-template-columns: repeat(3,1fr);
+    gap:20px;
+    padding:20px;
+}
+
+.table-card{
+    border-radius:20px;
+    padding:20px;
+    text-align:center;
+    position:relative;
+    height: 250px; /* card height fixed */
+}
+
+.table-card.active{
+    background-color:#4cd964; /* band */
+}
+
+.table-card.inactive{
+    background-color:#ff3b30; /* bosh */
+}
+
+.timer-price{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:10px;
+}
+
+.session-list-container{
+    max-height:120px;
+    overflow-y:auto;
+    margin-top:10px;
+}

@@ -12,7 +12,7 @@ class Session(models.Model):
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="stopped")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
     payment_done = models.BooleanField(default=False)
 
     def __str__(self):

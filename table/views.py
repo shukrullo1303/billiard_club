@@ -1,26 +1,35 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from table.models import Table
 from session.models import Session
 from django.utils import timezone
-from django.db.models import Sum
+from session.models import Session
+from django.db.models import Prefetch
 
-class TableDashboardView(TemplateView):
+
+
+class DashboardView(TemplateView):
     template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        tables = Table.objects.all()
-        # Paid sessions for today
-        today = timezone.localdate()
-        paid_sessions = Session.objects.filter(
-            payment__isnull=False,
-            end_time__date=today
-        )
-        total_income = paid_sessions.aggregate(total=Sum('total_price'))['total'] or 0
+        tables_data = []
 
-        context.update({
-            "tables": tables,
-            "paid_sessions": paid_sessions,
-            "total_income": total_income,
-        })
+        for table in Table.objects.prefetch_related('sessions').all():
+            active_session = table.sessions.filter(status='active').first()
+            tables_data.append({
+                'id': table.id,
+                'number': table.number,
+                'price_per_hour': float(table.price_per_hour),
+                'active_session': {
+                    'id': active_session.id,
+                    'start_time': active_session.start_time,
+                    'end_time': active_session.end_time,
+                    'total_price': active_session.total_price
+                } if active_session else None
+            })
+
+        context['tables'] = tables_data
+        context['paid_sessions'] = Session.objects.filter(payment_done=True).order_by('end_time')
+        context['unpaid_sessions'] = Session.objects.filter(payment_done=False).order_by('start_time')
+        context['total_income'] = sum([s.total_price for s in context['paid_sessions']])
         return context
