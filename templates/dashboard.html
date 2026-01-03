@@ -19,7 +19,7 @@
      {% endif %}
 >
     <div class="table-number">
-        {{ table.number }} - {{ table.table_type }}
+        {{ table.number }} - Stol
     </div>
 
     <div class="timer-price">
@@ -60,9 +60,9 @@
             {% for session in unpaid_sessions %}
                 {% if session.table_id == table.id %}
                     <li id="session-{{ session.id }}">
-                        {{ forloop.counter }} - Table {{ session.table_number }} - 
+                        Table {{ session.table.number }} - 
                         {{ session.start_time|date:"H:i" }} - 
-                        {{ session.end_time|default:"--" }} - 
+                        {{ session.end_time|default:"X" }} - 
                         {{ session.total_price }}
                         <button onclick="paySession({{ session.id }})">x</button>
                     </li>

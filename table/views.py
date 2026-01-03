@@ -28,8 +28,12 @@ class DashboardView(TemplateView):
                 } if active_session else None
             })
 
+        today = timezone.localdate()
         context['tables'] = tables_data
-        context['paid_sessions'] = Session.objects.filter(payment_done=True).order_by('end_time')
+        context['paid_sessions'] = Session.objects.filter(
+            payment_done=True,
+            end_time__date=today
+        ).order_by('end_time')
         context['unpaid_sessions'] = Session.objects.filter(payment_done=False).order_by('start_time')
         context['total_income'] = sum([s.total_price for s in context['paid_sessions']])
         return context
