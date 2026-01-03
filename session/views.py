@@ -7,9 +7,11 @@ from table.models import Table
 from .models import Session
 
 import math
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
 
 
-
+@method_decorator(staff_member_required, name='dispatch')
 class StartSessionView(View):
     def post(self, request, table_id):
         table = Table.objects.get(id=table_id)
@@ -25,7 +27,7 @@ class StartSessionView(View):
 
 
 
-
+@method_decorator(staff_member_required, name='dispatch')
 class StopSessionView(View):
     def post(self, request, table_id):
         table = Table.objects.get(id=table_id)
@@ -56,7 +58,7 @@ class StopSessionView(View):
 
 
 
-
+@method_decorator(staff_member_required, name='dispatch')
 class PaySessionView(View):
     def post(self, request, session_id):
         session = Session.objects.get(id=session_id)
@@ -78,6 +80,8 @@ class PaySessionView(View):
         })
 
 
+
+@method_decorator(staff_member_required, name='dispatch')
 class LivePriceAPIView(View):
     def get(self, request, table_id):
         session = Session.objects.filter(table_id=table_id, status="active").first()

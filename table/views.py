@@ -4,9 +4,11 @@ from session.models import Session
 from django.utils import timezone
 from session.models import Session
 from django.db.models import Prefetch
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
 
 
-
+@method_decorator(staff_member_required, name='dispatch')
 class DashboardView(TemplateView):
     template_name = "dashboard.html"
 

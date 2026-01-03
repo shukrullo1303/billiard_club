@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'conf.middleware.AdminLoginRequiredMiddleware', 
 ]
 
 ROOT_URLCONF = 'conf.urls'
@@ -122,3 +123,5 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 TIME_ZONE = 'Asia/Tashkent'
 USE_TZ = True
+
+LOGIN_URL = '/admin/login/'
