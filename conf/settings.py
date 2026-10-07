@@ -129,3 +129,5 @@ USE_TZ = True
 LOGIN_URL = '/admin/login/'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Uploaded bar photos are served through the authenticated product image view.
+MEDIA_ROOT = BASE_DIR / 'media'

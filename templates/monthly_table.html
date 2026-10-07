@@ -1,91 +1,44 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-<head>
-  <title>Monthly Report</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      color: #333;
-      padding: 30px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #2c3e50;
-    }
-    table {
-      width: 90%;
-      margin: 0 auto;
-      border-collapse: collapse;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    th, td {
-      padding: 12px 15px;
-      text-align: center;
-    }
-    th {
-      background-color: #3498db;
-      color: white;
-      font-weight: bold;
-    }
-    tr:nth-child(even) {
-      background-color: #ecf0f1;
-    }
-    tr:nth-child(odd) {
-      background-color: #ffffff;
-    }
-    tfoot td {
-      font-weight: bold;
-      background-color: #2c3e50;
-      color: white;
-    }
-    .back-link {
-      display: block;
-      text-align: center;
-      margin: 20px auto;
-      text-decoration: none;
-      color: #3498db;
-      font-weight: bold;
-    }
-    .back-link:hover {
-      color: #2980b9;
-    }
-  </style>
-</head>
-</head>
-<body>
-    <h1>Monthly Report for {{ month_name }} {{ selected_year }}</h1>
-
-    <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Income</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for day in daily_income %}
-                <tr>
-                    <td>{{ day.date }}</td>
-                    <td>{{ day.total|floatformat:0 }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="2">No sessions for this month.</td>
-                </tr>
-            {% endfor %}
-            <tr>
-                <th>Total</th>
-                <th>{{ monthly_total|floatformat:0 }}</th>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{% url 'reports:monthly_select' %}">Back to Month Selection</a>
-</body>
-</html>
+{% extends 'report_base.html' %}
+{% block report %}
+<div class="reports-workspace">
+  <div class="reports-heading">
+    <div><div class="eyebrow">HISOB VA NAZORAT</div><h1>Hisobotlar</h1><p>Bilyard, PlayStation va bar tushumlari bir joyda.</p></div>
+    <div class="report-downloads"><a class="button primary report-export" href="{{ pdf_url }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v5h14v-5"/></svg>PDF yuklash</a><a class="button subtle report-export" href="{{ export_url }}" title="Excel uchun CSV yuklash">CSV</a></div>
+  </div>
+  <section class="panel report-filter-card" aria-label="Hisobot filtrlari">
+    <form method="get" action="{% url 'reports:monthly_table' %}" class="report-filters">
+      <label for="report-year">Yil<select name="year" id="report-year">{% for year in years_with_data %}<option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>{% endfor %}</select></label>
+      <label for="report-month">Oy<select name="month" id="report-month">{% for number, name in month_list %}<option value="{{ number }}" {% if number == selected_month %}selected{% endif %}>{{ name }}</option>{% endfor %}</select></label>
+      <label for="report-table">Stol / PS<select name="table" id="report-table"><option value="">Barchasi</option>{% for table in report_tables %}<option value="{{ table.pk }}" {% if table.pk == selected_table_id %}selected{% endif %}>{{ table.label }}</option>{% endfor %}</select></label>
+      <button class="button primary" type="submit">Ko‘rsatish</button>
+    </form>
+    {% if filter_notice %}<p class="report-notice" role="status">{{ filter_notice }}</p>{% endif %}
+    <div class="report-period"><div class="report-month-navigation">{% if previous_month_url %}<a href="{{ previous_month_url }}" aria-label="Oldingi oy" title="Oldingi oy">‹</a>{% endif %}<strong>{{ month_name }} {{ selected_year }}</strong>{% if next_month_url %}<a href="{{ next_month_url }}" aria-label="Keyingi oy" title="Keyingi oy">›</a>{% endif %}</div><a href="{{ current_month_url }}" class="report-current-month">Joriy oy</a></div>
+  </section>
+  <div class="report-summary report-summary-split" aria-label="Oylik natijalar">
+    <article class="report-stat report-stat-income"><span>Umumiy tushum</span><strong>{{ monthly_total|floatformat:'0g' }}<small>so‘m</small></strong><p>{{ payment_count }} ta to‘lov · {{ report_date_start|date:'d.m' }} - {{ report_date_end|date:'d.m' }}</p></article>
+    <article class="report-stat"><span>Bilyard</span><strong>{{ billiard_total|floatformat:'0g' }}<small>so‘m</small></strong><p>{{ billiard_count }} ta to‘langan o‘yin</p></article>
+    <article class="report-stat report-stat-ps"><span>PlayStation</span><strong>{{ ps_total|floatformat:'0g' }}<small>so‘m</small></strong><p>{{ ps_count }} ta to‘langan o‘yin</p></article>
+    <article class="report-stat report-stat-bar"><span>Bar</span><strong>{{ bar_total|floatformat:'0g' }}<small>so‘m</small></strong><p>{{ bar_count }} ta savdo</p></article>
+  </div>
+  {% if payment_count %}
+  <section class="panel report-breakdown report-daily">
+    <div class="report-section-heading"><div><h2>Kunlik tushum</h2><p>{{ selected_table_label }} · oxirgi kundan boshlab</p></div><span>{{ daily_income|length }} kun</span></div>
+    <div class="report-table-wrap"><table class="report-table"><caption class="report-sr-only">{{ month_name }} {{ selected_year }} - kunlik tushum</caption><thead><tr><th scope="col">Sana</th><th scope="col">Bilyard</th><th scope="col">PS</th><th scope="col">Bar</th><th scope="col">Jami</th></tr></thead><tbody>{% for day in daily_income %}<tr><td>{{ day.date|date:'d.m' }}</td><td>{{ day.billiard|floatformat:'0g' }}</td><td>{{ day.ps|floatformat:'0g' }}</td><td>{{ day.bar|floatformat:'0g' }}</td><td>{{ day.total|floatformat:'0g' }}</td></tr>{% endfor %}</tbody><tfoot><tr><th scope="row">Jami</th><td>{{ billiard_total|floatformat:'0g' }}</td><td>{{ ps_total|floatformat:'0g' }}</td><td>{{ bar_total|floatformat:'0g' }}</td><td>{{ monthly_total|floatformat:'0g' }}</td></tr></tfoot></table></div>
+  </section>
+  <div class="report-breakdowns">
+    <section class="panel report-breakdown">
+      <div class="report-section-heading"><div><h2>Stollar va PlayStation</h2><p>To‘langan o‘yinlar, so‘m</p></div></div>
+      <div class="report-table-wrap"><table class="report-table"><caption class="report-sr-only">Stollar va PlayStation bo‘yicha tushum</caption><thead><tr><th scope="col">Joy</th><th scope="col">O‘yin</th><th scope="col">Tushum</th></tr></thead><tbody>{% for table in table_income %}<tr><td><span class="report-table-number">{{ table.label }}</span></td><td>{{ table.count }} ta</td><td>{{ table.total|floatformat:'0g' }}</td></tr>{% empty %}<tr><td colspan="3">Bu davrda o‘yin to‘lovi yo‘q.</td></tr>{% endfor %}</tbody></table></div>
+    </section>
+    <section class="panel report-breakdown">
+      <div class="report-section-heading"><div><h2>Bar savdosi</h2><p>Sotilgan mahsulotlar, so‘m</p></div></div>
+      <div class="report-table-wrap"><table class="report-table"><caption class="report-sr-only">Bar mahsulotlari bo‘yicha tushum</caption><thead><tr><th scope="col">Mahsulot</th><th scope="col">Soni</th><th scope="col">Tushum</th></tr></thead><tbody>{% for item in bar_items %}<tr><td class="report-product-name">{{ item.name }}</td><td>{{ item.quantity }}</td><td>{{ item.total|floatformat:'0g' }}</td></tr>{% empty %}<tr><td colspan="3">Bu davrda bar savdosi yo‘q.</td></tr>{% endfor %}</tbody></table></div>
+    </section>
+  </div>
+  {% else %}
+  <section class="panel report-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 3h10l3 3v15H4V3h3Zm9 0v5h4M8 12h8M8 16h5"/></svg><h2>Bu davrda to‘lovlar yo‘q</h2><p>{{ month_name }} {{ selected_year }}{% if selected_table %}, {{ selected_table_label }}{% endif %} uchun to‘lov topilmadi.<br>Boshqa oy yoki joyni tanlashingiz mumkin.</p><a class="button subtle" href="{% url 'reports:monthly_select' %}">Joriy oy · barcha joylar</a></section>
+  {% endif %}
+  <p class="report-footnote">Summalar so‘mda. Yangi o‘yin to‘lovlari qabul qilingan sana, bar savdosi sotilgan sana bo‘yicha hisoblanadi. Oldindan to‘langan faol o‘yinlar ham kiritiladi. Eski to‘lovlarda o‘yin tugagan sana ishlatiladi. To‘lovi kutilayotgan o‘yinlar kiritilmaydi.</p>
+</div>
+{% endblock %}

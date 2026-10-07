@@ -1,95 +1,33 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Table Dashboard</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
-</head>
+<html lang="uz">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vektor — Bilyard boshqaruvi</title><link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=20261007-3"></head>
 <body>
-<h1>Table Dashboard</h1>
-
-<div class="table-container">
-    {% for table in tables %}
-<div class="table-card {% if table.active_session %}active{% else %}inactive{% endif %}" 
-     id="table-{{ table.id }}"
-     data-table-id="{{ table.id }}"
-     data-price-per-hour="{{ table.price_per_hour }}"
-     {% if table.active_session %}
-         data-active-start="{{ table.active_session.start_time|date:'c' }}"
-     {% endif %}
->
-    <div class="table-number">
-        {{ table.number }} - Stol
-    </div>
-
-    <div class="timer-price">
-        <span class="timer" id="timer-{{ table.id }}">
-            {% if table.active_session %}
-                {{ table.active_session.start_time|date:"H:i" }}
-            {% else %}
-                00:00
-            {% endif %}
-        </span>
-        <span class="price" id="price-{{ table.id }}">
-            {% if table.active_session %}
-                {{ table.active_session.total_price|default:"0" }}
-            {% else %}
-                0
-            {% endif %}
-        </span>
-    </div>
-
-    <div class="btn-container" style="display: flex; justify-content: center; margin-top: 10px">
-<button class="btn start {% if table.active_session %}btn-inactive{% endif %}" 
-        id="start-{{ table.id }}" 
-        onclick="startSession({{ table.id }})" 
-        {% if table.active_session %}disabled{% endif %}>
-    START
-</button>
-
-<button class="btn stop {% if table.active_session %}btn-active{% endif %}" 
-        id="stop-{{ table.id }}" 
-        onclick="stopSession({{ table.id }})" 
-        {% if table.active_session %}disabled{% endif %}>
-    STOP
-</button>
-    </div>
-
-    <div class="session-list-container">
-        <ul class="session-list" id="session-list-{{ table.id }}">
-            {% for session in unpaid_sessions %}
-                {% if session.table_id == table.id %}
-                    <li id="session-{{ session.id }}">
-                        Table {{ session.table.number }} - 
-                        {{ session.start_time|date:"H:i" }} - 
-                        {{ session.end_time|default:"X" }} - 
-                        {{ session.total_price }}
-                        <button onclick="paySession({{ session.id }})">x</button>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
-</div>
-
-    {% endfor %}
-</div>
-
-<h2>Paid Sessions (Today)</h2>
-<p id="total-income">Bugungi foyda: {{ total_income }} so'm</p>
-<div class="paid-session-list-container">
-    <ul class="paid-session-list" id="paid-sessions-list">
-        {% for session in paid_sessions %}
-            <li>{{ forloop.counter }} - Table {{ session.table_number }} - {{ session.start_time|date:"H:i" }} - {{ session.end_time|date:"H:i" }} - {{ session.total_price }}</li>
-        {% empty %}
-            <li>Bugun hali to‘lov qilinmagan.</li>
-        {% endfor %}
-    </ul>
-</div>
-
-<script>
-const csrftoken = '{{ csrf_token }}';
-</script>
-<script src="{% static 'js/dashboard.js' %}"></script>
-</body>
-</html>
+{% include 'sidebar.html' %}
+<main><header><div class="breadcrumb">Boshqaruv <span>/</span> Zal</div><div class="header-right"><span id="today"></span><span class="avatar">{{ request.user.username|first|upper }}</span></div></header>
+<div class="workspace"><section class="panel floor-panel"><div class="panel-heading"><div><h2>Zal xaritasi</h2><p>Bilyard klubi — joylashuv rejasi</p></div><button id="edit-layout" class="button subtle">✎ Joylashuvni tahrirlash</button></div><div id="edit-tools" hidden><span>Kataklar bo‘yicha stolni suring.</span><button id="cancel-layout" class="button subtle">Bekor qilish</button><button id="save-layout" class="button primary">Saqlash</button></div><div class="map-legend"><span><i class="dot available"></i>Bo‘sh</span><span><i class="dot occupied"></i>Band</span><span><i class="dot reserved-dot"></i>Bron</span><span class="map-hint">Tafsilotlar uchun stolni tanlang</span></div><div class="floor-wrap"><div class="plan-scroll"><div class="club-plan">
+<svg class="plan-drawing" viewBox="0 0 1000 660" role="img" aria-label="O‘ngda WC, PS 1 va PS 2 xonalari. Pastda kirish va bar/kassa.">
+<defs><pattern id="bar-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" fill="#fff4df"/><path d="M0 0 V9" stroke="#dfb576" stroke-width="2"/></pattern><marker id="route-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10" fill="none" stroke="#2897ba" stroke-width="2"/></marker></defs>
+<rect x="385" y="18" width="185" height="82" fill="url(#bar-hatch)" stroke="#bc873e" stroke-width="2"/><rect x="394" y="25" width="166" height="21" fill="#af8048"/>
+<text transform="rotate(180 485 72)" x="485" y="72" text-anchor="middle" class="room-label">BAR / KASSA</text>
+<rect x="185" y="100" width="815" height="525" fill="#fff" stroke="#334557" stroke-width="3"/>
+<rect x="0" y="100" width="185" height="267" fill="#e3f1fa" stroke="#334557" stroke-width="2"/>
+<rect x="0" y="100" width="79" height="65" fill="#e9f0e8" stroke="#334557" stroke-width="2"/>
+<rect x="0" y="165" width="134" height="101" fill="#efebfa" stroke="#334557" stroke-width="2"/><rect x="0" y="266" width="134" height="101" fill="#efebfa" stroke="#334557" stroke-width="2"/>
+<rect x="10" y="178" width="24" height="74" fill="#a192c5"/><rect x="10" y="280" width="24" height="74" fill="#a192c5"/>
+<text transform="rotate(180 31 136)" x="31" y="136" text-anchor="middle" class="room-label small-room">WC</text><text transform="rotate(180 77 219)" x="77" y="219" text-anchor="middle" class="room-label"></text><text transform="rotate(180 77 320)" x="77" y="320" text-anchor="middle" class="room-label"></text>
+<text transform="rotate(180 117 130)" x="117" y="130" text-anchor="middle" class="route-label"><tspan x="117">WC ga</tspan><tspan x="117" dy="13">o‘tish</tspan></text><text x="163" y="310" transform="rotate(90 163 310)" class="route-label">YO‘LAK</text>
+<path d="M79 114 V151 M134 177 V215 M134 278 V316" stroke="#efebfa" stroke-width="4"/><path d="M79 114 H42 Q42 149 79 151 M134 177 H97 Q97 211 134 215 M134 278 H97 Q97 313 134 316" stroke="#389dcb" fill="none" stroke-width="1.2"/>
+<path d="M185 100 H360" stroke="white" stroke-width="5"/><path d="M185 100 H360" stroke="#339bca" stroke-width="2.5" stroke-dasharray="10 5"/>
+<text transform="rotate(180 271 72)" x="271" y="72" text-anchor="middle" class="gate-label">DARVOZA</text><text transform="rotate(180 202 152)" x="202" y="152" class="route-label">KIRISH</text>
+<path d="M396 100 H436" stroke="#fff" stroke-width="5"/><path d="M436 100 V61 Q403 61 396 100" fill="none" stroke="#3998c4" stroke-width="1.5"/>
+<path d="M185 215 V249" stroke="#e3f1fa" stroke-width="5"/>
+<path d="M222 111 V234 H166 M234 132 H416 V80" stroke="#2897ba" stroke-width="2" stroke-dasharray="7 4" stroke-linecap="round" fill="none" marker-end="url(#route-arrow)"/>
+<rect x="403" y="348" width="23" height="20" fill="#334557"/><rect x="587" y="348" width="23" height="20" fill="#334557"/><rect x="771" y="348" width="23" height="20" fill="#334557"/>
+</svg>
+<div id="ps-nodes"></div><div class="floor" id="floor"><div id="table-nodes"></div></div>
+</div></div><p class="map-note">Stolni tanlang va o‘yinni boshqaring.</p></div></section>
+</div></main>
+{% include 'control_drawer.html' %}
+<div id="toast" role="status" hidden></div>{% csrf_token %}{{ table_data|json_script:'table-data' }}{{ products|json_script:'product-data' }}<script src="{% static 'js/dashboard.js' %}?v=20261007-3"></script>
+</body></html>

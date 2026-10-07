@@ -1,0 +1,54 @@
+{% extends 'report_base.html' %}
+{% load static %}
+{% block title %}Sozlamalar — Vektor{% endblock %}
+{% block breadcrumb %}Sozlamalar{% endblock %}
+{% block report %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+<div class="settings-page">
+    <div class="settings-title">
+        <div>
+            <span class="eyebrow">KLUB BOSHQARUVI</span>
+            <h1>Sozlamalar</h1>
+            <p>Har bir stol uchun bir soatlik o‘yin narxini belgilang.</p>
+        </div>
+        <span class="settings-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16M4 17h16"/><rect x="7" y="4" width="4" height="6" rx="1.4" fill="currentColor"/><rect x="14" y="14" width="4" height="6" rx="1.4" fill="currentColor"/></svg></span>
+    </div>
+
+    {% if success %}<div class="settings-notice settings-success" role="status"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m4 10 4 4 8-8"/></svg><span>Stol tariflari saqlandi.</span></div>{% endif %}
+    {% if error %}<div class="settings-notice settings-error" role="alert">{{ error }}</div>{% endif %}
+
+    <section class="panel settings-card" aria-labelledby="settings-rates-title">
+        <div class="settings-card-heading">
+            <div><h2 id="settings-rates-title">Stol tariflari</h2><p>Narxlar so‘mda, bir soat uchun.</p></div>
+            <span class="settings-badge">SO‘M / SOAT</span>
+        </div>
+        <form method="post" action="/settings/" class="settings-form">
+            {% csrf_token %}
+            <div class="settings-rate-list">
+                {% for table in table_data %}
+                <div class="settings-rate-row{% if table.start %} settings-rate-locked{% endif %}">
+                    <div class="settings-table-summary">
+                        <span class="settings-table-symbol" aria-hidden="true"><svg viewBox="0 0 30 22" fill="none"><rect x="2" y="2" width="26" height="18" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="5" cy="5" r="1.4" fill="currentColor"/><circle cx="15" cy="5" r="1.4" fill="currentColor"/><circle cx="25" cy="5" r="1.4" fill="currentColor"/><circle cx="5" cy="17" r="1.4" fill="currentColor"/><circle cx="15" cy="17" r="1.4" fill="currentColor"/><circle cx="25" cy="17" r="1.4" fill="currentColor"/></svg></span>
+                        <div><label for="rate-{{ table.id }}">{{ table.name }}</label><small>{% if table.start %}O‘yin davom etmoqda{% else %}Soatlik tarif{% endif %}</small></div>
+                    </div>
+                    <div class="settings-rate-input">
+                        <input id="rate-{{ table.id }}" name="rate_{{ table.id }}" type="number" inputmode="numeric" min="0" max="9999999999" step="1" value="{{ table.rate }}" required aria-label="{{ table.name }} uchun soatlik narx"{% if table.start %} disabled aria-describedby="active-rate-note"{% endif %}>
+                        <span>so‘m</span>
+                        {% if table.start %}<input type="hidden" name="rate_{{ table.id }}" value="{{ table.rate }}">{% endif %}
+                    </div>
+                </div>
+                {% empty %}<p class="settings-empty">Hozircha stol qo‘shilmagan. Stollarni kengaytirilgan sozlamalardan qo‘shing.</p>{% endfor %}
+            </div>
+            <div class="settings-form-footer">
+                <p id="active-rate-note">Band stolning tarifini o‘yin tugagach o‘zgartirish mumkin.</p>
+                {% if table_data %}<button type="submit" class="button primary"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m4 10 4 4 8-8"/></svg>Tariflarni saqlash</button>{% endif %}
+            </div>
+        </form>
+    </section>
+
+    <section class="settings-advanced" aria-labelledby="settings-advanced-title">
+        <div><h2 id="settings-advanced-title">Kengaytirilgan sozlamalar</h2><p>Stollar, xodimlar va tizim ma’lumotlarini boshqarish.</p></div>
+        <a class="button subtle" href="/admin/">Admin panel <span aria-hidden="true">↗</span></a>
+    </section>
+</div>
+{% endblock %}
